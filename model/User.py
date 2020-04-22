@@ -9,6 +9,12 @@ class User:
         self.password = self._hashPassword(password)
         self.createSessionId()
 
+    def __eq__(self, other):
+        if self.name == other.name and self.mail == other.mail and self.password == other.password \
+                and self.session_id == other.session_id:
+            return True
+        return False
+
     def makeJson(self):
         # TODO: (done?)
         json = {
@@ -41,10 +47,13 @@ class User:
     def createSessionId(self):
         self.session_id = secrets.token_urlsafe(16)
 
+
 def getUserFromJson(json):
-    #TODO session_id problem?
+    # password expected to be already hashed
+    # new session_id generated if not given in json
     if "name" in json and "mail" in json and "password" in json:
         user = User(json.get("name"), json.get("mail"), json.get("password"))
+        user.password = json.get("password")
         if "session_id" in json:
             user.session_id = json.get("session_id")
         return user
