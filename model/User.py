@@ -9,9 +9,22 @@ class User:
         self.password = self._hashPassword(password)
         self.createSessionId()
 
+    def __eq__(self, other):
+        if self.name == other.name and self.mail == other.mail and self.password == other.password \
+                and self.session_id == other.session_id:
+            return True
+        return False
+
     def makeJson(self):
-        # TODO:
-        pass
+        # TODO: (done?)
+        json = {
+            "name": self.name,
+            "mail": self.mail,
+            "password": self.password,
+            "session_id": self.session_id
+        }
+        return json
+
     def _hashPassword(self, password) -> str:
         """Hash a password for storing."""
         salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
@@ -34,6 +47,14 @@ class User:
     def createSessionId(self):
         self.session_id = secrets.token_urlsafe(16)
 
-def getUserFromJson(json):
-    #Todo: it
-    pass
+
+def getUserFromJson(json) -> User:
+    # password expected to be already hashed
+    if "name" in json and "mail" in json and "password" in json:
+        user = User(json.get("name"), json.get("mail"), json.get("password"))
+        user.password = json.get("password")
+        if "session_id" in json: # new session_id generated if not given in json
+            user.session_id = json.get("session_id")
+        return user
+    else:
+        raise Exception("Fields name, mail and password are needed")
