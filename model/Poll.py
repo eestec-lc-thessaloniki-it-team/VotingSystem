@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 
 class Poll:
@@ -11,10 +11,9 @@ class Poll:
 
     def __eq__(self, other):
         return (
-            self.question == other.question and self.options == other.options and self.named == other.named and
-               self.unique == other.unique and self.creator_user_id == other.creator_user_id
+                self.question == other.question and self.options == other.options and self.named == other.named and
+                self.unique == other.unique and self.creator_user_id == other.creator_user_id
         )
-
 
     def makeJson(self):
         dict = {
@@ -27,13 +26,10 @@ class Poll:
         return dict
 
 
-def getPollFromJson(json):
+def getPollFromJson(json) -> Poll:
     if "question" in json and "options" in json and "named" in json and "unique" in json and "creator_user_id" in json:
-
         new_poll = Poll(json.get("question"), json.get("options"), json.get("named"), json.get("unique"),
                         json.get("creator_user_id"))
-
-    return new_poll
-
-
-
+        return new_poll
+    else:
+        raise Exception("Fields name, mail and password are needed")

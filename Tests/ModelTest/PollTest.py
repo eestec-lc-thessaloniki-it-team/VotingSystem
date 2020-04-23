@@ -5,10 +5,10 @@ from model.Poll import *
 class PollTesting(unittest.TestCase):
 
     def setUp(self):
-
         self.poll = Poll("Do you like our voting system?", ["Yes", "Of course", "absolutely"], True, True, "001")
         self.json = {'question': 'Do you like our voting system?', 'options': ['Yes', 'Of course', 'absolutely'],
                      'named': True, 'unique': True, 'creator_user_id': '001'}
+        self.bad_poll_json = {'my_name': 'John'}
 
     def test_create_poll(self):
         self.assertEqual(self.poll.question, "Do you like our voting system?")
@@ -23,6 +23,7 @@ class PollTesting(unittest.TestCase):
     def test_getPollFromJson(self):
         self.assertEqual(getPollFromJson(self.json), self.poll)
 
+        self.assertRaises(Exception, lambda: getPollFromJson(self.bad_poll_json))
 
 
 if __name__ == '__main__':
