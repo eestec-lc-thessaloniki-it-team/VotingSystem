@@ -48,13 +48,12 @@ class User:
         self.session_id = secrets.token_urlsafe(16)
 
 
-def getUserFromJson(json):
+def getUserFromJson(json) -> User:
     # password expected to be already hashed
-    # new session_id generated if not given in json
     if "name" in json and "mail" in json and "password" in json:
         user = User(json.get("name"), json.get("mail"), json.get("password"))
         user.password = json.get("password")
-        if "session_id" in json:
+        if "session_id" in json: # new session_id generated if not given in json
             user.session_id = json.get("session_id")
         return user
     else:

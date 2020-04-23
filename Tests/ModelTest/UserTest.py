@@ -13,7 +13,7 @@ class UserTest(unittest.TestCase):
     def test_create_user(self):
         self.assertEqual(self.json.get("name"), self.user.name)
         self.assertEqual(self.json.get("mail"), self.user.mail)
-        self.assertTrue(self.user.verify_password("kodikos"))
+        self.assertTrue(self.user.verify_password(self.unhashed))
 
     def test_makeJson(self):
         self.assertEqual(self.json, self.user.makeJson())
