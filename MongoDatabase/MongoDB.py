@@ -1,6 +1,9 @@
+# import sys
+# sys.path.append("C:\\Users\\fotin\\OneDrive\\Documents\\VotingSystem")
 from typing import List
 from pymongo import MongoClient
 from model.User import User
+from MongoDatabase.user import * # get credentials
 from MongoDatabase.Databases.UserDB import UserDB
 from MongoDatabase.Databases.PollsDB import PollsDB
 from MongoDatabase.Databases.VotesDB import VotesDB
@@ -15,11 +18,11 @@ class MongoDB:
     """
 
     def __init__(self, database="lcThessalonikiVoting"):
-        url = """mongodb://{}:{}@116.203.85.249/{}""".format()  # TODO: fill with credentials
+        url = """mongodb://{}:{}@116.203.85.249/{}""".format(username, password, database)  # TODO: fill with credentials
         self.client = MongoClient(url, authSource="admin")[database]  # TODO: fill with credentials
-        self.userDB = UserDB(self.client)
-        self.pollsDB = PollsDB(self.client)
-        self.votesDB = VotesDB(self.client)
+        self.userDB = UserDB(self.client.lcThessaloniki)
+        self.pollsDB = PollsDB(self.client.lcThessaloniki)
+        self.votesDB = VotesDB(self.client.lcThessaloniki)
 
     def logIn(self, mail: str, password: str) -> UserWrapper:
         return self.userDB.logInUser(mail, password)
@@ -55,3 +58,14 @@ class MongoDB:
         else:
             return votesWrapper
 
+# my_db = MongoDB()
+
+# user = my_db.userDB.createNewUser("alex", "alex@gmail.com", "password").object
+
+# print(my_db.userDB._findUserByMail("alex@gmail.com").name)
+# print(list(my_db.userDB.db.find()))
+
+# wrapper = my_db.userDB.logInUser("alex@gmail.com", "password")
+
+# print(list(my_db.userDB.db.find()))
+# my_db.userDB.db.drop()
