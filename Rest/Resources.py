@@ -47,8 +47,7 @@ def getPollByID():
     pass
 
 
-
-@app.route("/vote") # This function will use parameters in url
+@app.route("/vote")  # This function will use parameters in url
 def vote():
     """
     In request we want session_id, chosen_option
@@ -59,7 +58,7 @@ def vote():
     pass
 
 
-@app.route("/results") # This function will use parameters in url
+@app.route("/results")  # This function will use parameters in url
 def results():
     """
     In request we want session_id
