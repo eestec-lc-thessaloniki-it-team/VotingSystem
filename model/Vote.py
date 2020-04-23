@@ -15,7 +15,6 @@ class Vote:
         )
 
 
-
     def makeJson(self):
         dict = {
             "user_id": self.user_id,
@@ -25,9 +24,12 @@ class Vote:
         }
         return dict
 
-def getVoteFromJson(json):
+def getVoteFromJson(json) -> Vote:
     if "user_id" in json and "poll_id" in json and "chosen_option" in json and "timestamp" in json:
         new_vote = Vote(json.get("user_id"), json.get("poll_id"), json.get("chosen_option"))
         new_vote.timestamp = json.get("timestamp")
-    return new_vote
+        return new_vote
+    else:
+        raise Exception("Fields name, mail and password are needed")
+
 

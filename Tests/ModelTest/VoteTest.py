@@ -1,14 +1,13 @@
 import unittest
-from model.Vote import*
+from model.Vote import *
 
 
 class VoteTest(unittest.TestCase):
 
     def setUp(self):
+        self.bad_json = {'my_name': 'John'}
         self.vote = Vote("1234", "5678", 2)
-        self.json = { 'user_id': '1234', 'poll_id': '5678', 'chosen_option': 2, 'timestamp': self.vote.timestamp}
-
-
+        self.json = {'user_id': '1234', 'poll_id': '5678', 'chosen_option': 2, 'timestamp': self.vote.timestamp}
 
     def test_create_vote(self):
         self.assertEqual(self.vote.user_id, "1234")
@@ -21,6 +20,7 @@ class VoteTest(unittest.TestCase):
 
     def test_getVoteFromJson(self):
         self.assertEqual(getVoteFromJson(self.json), self.vote)
+        self.assertRaises(Exception, lambda: getVoteFromJson(self.bad_json))
 
 
 if __name__ == '__main__':
