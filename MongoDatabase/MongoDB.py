@@ -1,5 +1,6 @@
 # import sys
 # sys.path.append("C:\\Users\\fotin\\OneDrive\\Documents\\VotingSystem")
+from datetime import datetime
 from typing import List
 from pymongo import MongoClient
 from model.User import User
@@ -10,6 +11,8 @@ from MongoDatabase.Databases.VotesDB import VotesDB
 from MongoDatabase.Wrappers.UserWrapper import UserWrapper
 from MongoDatabase.Wrappers.PollWrapper import PollWrapper
 from MongoDatabase.Wrappers.VotesWrapper import VotesWrapper
+from model.Vote import getVoteFromJson, Vote  # TODO DELETE
+
 
 
 class MongoDB:
@@ -59,13 +62,4 @@ class MongoDB:
             return votesWrapper
 
 # my_db = MongoDB()
-
-# user = my_db.userDB.createNewUser("alex", "alex@gmail.com", "password").object
-
-# print(my_db.userDB._findUserByMail("alex@gmail.com").name)
-# print(list(my_db.userDB.db.find()))
-
-# wrapper = my_db.userDB.logInUser("alex@gmail.com", "password")
-
-# print(list(my_db.userDB.db.find()))
-# my_db.userDB.db.drop()
+# my_db.votesDB.db.drop()

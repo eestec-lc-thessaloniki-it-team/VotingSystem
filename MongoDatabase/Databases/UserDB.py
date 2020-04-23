@@ -20,9 +20,14 @@ class UserDB:
         :param mail:
         :return:
         """
-        jsonReturned = self.db.find_one({"mail": mail})
-        object = getUserFromJson(jsonReturned)
-        return object
+        try:
+            jsonReturned = self.db.find_one({"mail": mail})
+            if jsonReturned:
+                object = getUserFromJson(jsonReturned)
+                return object
+            return None
+        except:
+            return None
 
     def getUserWithSessionId(self, session_id: str) -> (Optional[User], str):
         """
@@ -42,11 +47,16 @@ class UserDB:
         :param password:
         :return:
         """
-        # TODO: check if mail already exists
+        _user = self._findUserByMail(mail)
+        if _user:
+            return UserWrapper(_user, True, True, False)
+
+        # TODO: check if mail already exists DONE
+
         user: User = User(name, mail, password)
         self.db.insert_one(user.makeJson())
         # Todo: persist it to database
-        return UserWrapper(user, True, True, True)
+        return UserWrapper(user, False, False, True) # false???
 
     def logInUser(self, mail: str, password: str) -> UserWrapper:
         """
