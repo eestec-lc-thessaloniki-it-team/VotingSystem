@@ -1,8 +1,9 @@
 from model.Vote import *
 
+
 class VotesWrapper:
 
-    def __init__(self, lastTimestamp, votes, named = False, found = False, userFound = False, operationDone = False):
+    def __init__(self, lastTimestamp, votes, named=False, found=False, userFound=False, operationDone=False):
         self.lastTimestamp = lastTimestamp
         self.votes = votes
         self.named = named

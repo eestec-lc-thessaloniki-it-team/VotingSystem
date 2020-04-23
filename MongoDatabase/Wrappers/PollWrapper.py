@@ -1,8 +1,9 @@
 from model.Poll import *
 
+
 class PollWrapper:
 
-    def __init__(self, object: Poll, pollId, found = False, userFound = False, operationDone = False):
+    def __init__(self, object: Poll, pollId, found=False, userFound=False, operationDone=False):
         self.object = object
         self.pollId = pollId
         self.found = found
