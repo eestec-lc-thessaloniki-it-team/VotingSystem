@@ -1,9 +1,14 @@
 import flask, os
 from flask import request, jsonify
 
+from MongoDatabase.MongoDB import MongoDB
+from MongoDatabase.Wrappers.PollWrapper import PollWrapper
+from model.Poll import getPollFromJson
+
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+database = MongoDB()
 
 
 @app.route("/login", methods=['POST'])
@@ -42,9 +47,16 @@ def getPollByID():
     We want session_id in request
     :return:
     """
-    poll_id = request.args.get("id")
     # TODO: this will call getPollById from MongoDB and take care for all the possible wrapper context
-    pass
+    try:
+        poll_id = request.args.get("id")
+        session_id = request.json.get("session_id")
+        poll_wrapper: PollWrapper = getPollFromJson(database.getPollById(poll_id, session_id))
+        if not poll_wrapper.userFound:
+            return jsonify(response=400, msg="Could not find user with session_id: " + session_id)
+        return jsonify(response=200, wrapper=poll_wrapper)
+    except:
+        return jsonify(response=500, msg="Something went wrong")
 
 
 @app.route("/vote")  # This function will use parameters in url
