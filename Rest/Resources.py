@@ -67,9 +67,18 @@ def vote():
     In request we want session_id, chosen_option
     :return:
     """
-    poll_id = request.args.get("id")
-    # TODO: this will call vote from MongoDB and take care for all the possible wrapper context
-    pass
+    try:
+        poll_id = request.args.get("id")
+        session_id = request.json.get("session_id")
+        chosen_option = request.json.get("chosen_option")
+        vote_wrapper: VotesWrapper = database.vote(poll_id, chosen_option, session_id)
+        if not vote_wrapper.userFound:
+            return jsonify(response=400, msg="Could not find user with session_id: " + session_id)
+        if not vote_wrapper.found:
+            return jsonify(response=404, msg="Could not find vote with id: " + poll_id)
+        return jsonify(response=200, wrapper=vote_wrapper)
+    except:
+        return jsonify(response=500, msg="Something went wrong")
 
 
 @app.route("/results")  # This function will use parameters in url
