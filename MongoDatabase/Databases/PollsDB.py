@@ -11,7 +11,7 @@ class PollsDB:
 
     def _findPollById(self, poll_id: str) -> Optional[Poll]:
         """
-
+        Finds a poll with poll_id
         :param poll_id:
         :return:
         """
@@ -27,16 +27,15 @@ class PollsDB:
 
     def createPoll(self, question: str, options: List[str], named: bool, unique: bool, user_id: str) -> PollWrapper:
         """
+        Creates a new Poll
         :param user:
         :param question:
         :param options:
         :param named:
         :param unique:
         :param session_id:
-        :return:
+        :return: PollWrapper
         """
-        # TODO: persist it in the database and return the proper wrapper
-        # TODO: if something went wrong return operationsDone=false
         try:
             poll:Poll=Poll(question,options,named,unique,user_id)
             poll_id = str(self.db.insert_one(poll.makeJson()).inserted_id)
@@ -51,8 +50,6 @@ class PollsDB:
         """
         try:
             poll: Poll = self._findPollById(poll_id)
-            # TODO: wrap it in a wrapper
-            # Todo: if poll_id don't exist send found=false
             if poll:
                 return PollWrapper(poll, poll_id, found=True, userFound=True, operationDone=True)
             return PollWrapper(poll, poll_id, found=False, userFound=False, operationDone=False)

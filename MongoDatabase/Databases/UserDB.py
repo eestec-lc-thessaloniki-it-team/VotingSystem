@@ -35,11 +35,14 @@ class UserDB:
         :param session_id:
         :return: the user object, the user_id from mongo
         """
-        jsonReturned = self.db.find_one({"session_id": session_id})
-        if jsonReturned:
-            object = getUserFromJson(jsonReturned)
-            return object, str(jsonReturned["_id"])
-        else:
+        try:
+            jsonReturned = self.db.find_one({"session_id": session_id})
+            if jsonReturned:
+                object = getUserFromJson(jsonReturned)
+                return object, str(jsonReturned["_id"])
+            else:
+                return None, ""
+        except:
             return None, ""
 
     def createNewUser(self, name: str, mail: str, password: str) -> UserWrapper:

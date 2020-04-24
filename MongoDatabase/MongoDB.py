@@ -35,17 +35,24 @@ class MongoDB:
 
     def createPoll(self, question: str, options: List[str], named: bool, unique: bool, session_id: str) -> PollWrapper:
         (user, user_id) = self.userDB.getUserWithSessionId(session_id)
+        if user is None:
+            return PollWrapper(None, "", found=False, userFound=False, operationDone=False)
         # TODO: check if user is not none, if is is return userFound=False
+
         return self.pollsDB.createPoll(question, options, named, unique, user_id)
 
     def getPollById(self, poll_id: str, session_id: str) -> PollWrapper:
         (user, user_id) = self.userDB.getUserWithSessionId(session_id)
+        if user is None:
+            return PollWrapper(None, "", found=False, userFound=False, operationDone=False)
         # TODO: check if user is not none, if is is return userFound=False
         return self.pollsDB.getPollById(poll_id)
 
     def vote(self, poll_id: str, chosen_option: int, session_id: str) -> VotesWrapper:
         (user, user_id) = self.userDB.getUserWithSessionId(session_id)
         # TODO: check if user is not none, if is is return userFound=False
+        if user is None:
+            return VotesWrapper("", {}, named=False, found=False, userFound=False, operationDone=False)
         votesWrapper: VotesWrapper = self.votesDB.createVote(poll_id, user_id, chosen_option)
         if votesWrapper.named:
             return self.userDB.fillUsernames(votesWrapper)
@@ -55,6 +62,8 @@ class MongoDB:
     def results(self, poll_id: str, after_timestamp,session_id: str):
         (user, user_id) = self.userDB.getUserWithSessionId(session_id)
         # TODO: check if user is not none, if is is return userFound=False
+        if user is None:
+            return VotesWrapper("", {}, named=False, found=False, userFound=False, operationDone=False)
         named = self.pollsDB.getPollById(poll_id).object.named
         votesWrapper: VotesWrapper=self.votesDB.getAllVotes(poll_id,named,after_timestamp)
         if votesWrapper.named:
@@ -63,9 +72,9 @@ class MongoDB:
             return votesWrapper
 
 my_db = MongoDB()
-user1 = User("alex","mail","sdas")
-user2 = User("aleeex2","maisl","sdaxs")
-user3 = User("aaaalex3","msail","sdgdas")
+user1 = User("user1","mail1","sdaeas")
+user2 = User("user2","mail2","ssdaxs")
+user3 = User("user3","mail3","sdgdas")
 
 user1_id = my_db.userDB.db.insert_one(user1.makeJson()).inserted_id
 user2_id = my_db.userDB.db.insert_one(user2.makeJson()).inserted_id
@@ -73,7 +82,11 @@ user3_id = my_db.userDB.db.insert_one(user3.makeJson()).inserted_id
 
 vote1 = my_db.votesDB.createVote(str(user1_id),"1",1)
 vote2 = my_db.votesDB.createVote(str(user2_id),"1",0)
-vote3 = my_db.votesDB.createVote(str(user3_id),"1",0)
+vote3 = my_db.votesDB.createVote(str(user3_id),"1",2)
+vote4 = my_db.votesDB.createVote(str(user3_id),"1",3)
+vote5 = my_db.votesDB.createVote(str(user3_id),"1",1)
+vote6 = my_db.votesDB.createVote(str(user3_id),"1",0)
+
 
 wrapper = my_db.votesDB.getAllVotes("1",True)
 print(wrapper.votes)

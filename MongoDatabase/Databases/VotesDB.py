@@ -7,9 +7,10 @@ class VotesDB:
         self.client = client
         self.db = self.client.votesDB
 
-    def createVote(self, poll_id: str, user_id: str, chosen_option: int) -> VotesWrapper:
+    def createVote(self, user_id: str, poll_id: str, chosen_option: int) -> VotesWrapper:
         try:
-            vote: Vote = Vote(poll_id, user_id, chosen_option)  # timestamp will be created automatically
+
+            vote: Vote = Vote(user_id, poll_id, chosen_option)  # timestamp will be created automatically
             self.db.insert_one(vote.makeJson())
             return self.getAllVotes(poll_id)
         except:
