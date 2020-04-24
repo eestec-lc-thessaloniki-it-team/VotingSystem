@@ -88,7 +88,7 @@ class UserDB:
 
     def deleteUser(self, mail: str) -> UserWrapper:
         _user = self._findUserByMail(mail)
-        if not _user:  # didnt find it
+        if not _user:  # did not find it
             return UserWrapper(None, found=False, userFound=False, operationDone=False)
         try:
             returned = self.db.delete_many({'mail': mail})
@@ -102,4 +102,13 @@ class UserDB:
         :param votesWrapper:
         :return: Return the wrapper that now contain the names
         """
-        return VotesWrapper()
+        if votesWrapper.votes:
+            for option,userList in votesWrapper.votes.items():
+                if type(userList) is not list:
+                    raise ValueError("Dict must contain only list values")
+            votesDict = {option:list() for option in votesWrapper.votes}
+            for option, userList in votesWrapper.votes.items():
+                votesDict[option] = [getUserFromJson(self.db.find_one({"_id": ObjectId(user_id)})).name for user_id in userList]
+            return VotesWrapper(votesWrapper.lastTimestamp, votesDict, found=votesWrapper.found, userFound=votesWrapper.userFound, operationDone=votesWrapper.operationDone)
+
+        return VotesWrapper(votesWrapper.lastTimestamp, {}, found=False, userFound=False, operationDone=False)

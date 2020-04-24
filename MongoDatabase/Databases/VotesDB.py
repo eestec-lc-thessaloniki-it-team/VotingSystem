@@ -2,7 +2,6 @@ from MongoDatabase.Wrappers.VotesWrapper import VotesWrapper
 from model.Vote import Vote
 from model.Vote import getVoteFromJson
 
-
 class VotesDB:
     def __init__(self, client):
         self.client = client
@@ -16,7 +15,7 @@ class VotesDB:
         except:
             return VotesWrapper(None, {})
 
-    def getAllVotes(self, poll_id: str, after_timestamp=0) -> VotesWrapper:
+    def getAllVotes(self, poll_id: str, named: bool, after_timestamp=0) -> VotesWrapper:
         """
 
         :param poll_id:
@@ -25,6 +24,7 @@ class VotesDB:
         the user_id, else pass only the numbers. Make sure to set named in wrapper
         """
         try:
+
             if after_timestamp:
                 voteList = [getVoteFromJson(voteJson) for voteJson in
                             self.db.find({"timestamp": {"$gt": after_timestamp}})
@@ -36,10 +36,12 @@ class VotesDB:
             voteDict = {vote.chosen_option: list() for vote in voteList}
             for vote in voteList:
                 voteDict[vote.chosen_option].append(vote.user_id)
-            return VotesWrapper(after_timestamp, voteDict, False, True, True,
-                                True)  # TODO: named? you get it from poll_id -> pollDB
+            if not named:
+                voteDict = {option: len(userlist) for option, userlist in voteDict.items()}
+            return VotesWrapper(after_timestamp, voteDict, named=named, found=True, userFound=True,
+                                operationDone=True)  # TODO: named? you get it from poll_id -> pollDB
         except:
             return VotesWrapper(None, {})
 
-    def deleteVote(self):
-        pass
+    def deleteVote(self, poll_id):
+        return bool(self.db.delete_many({"poll_id":poll_id}).deleted_count)
