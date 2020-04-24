@@ -39,4 +39,5 @@ class PollsDB:
         """
         poll: Poll = self._findPollById(poll_id)
         # TODO: wrap it in a wrapper
+        #Todo: if poll_id don't exist send found=false
         return PollWrapper()
