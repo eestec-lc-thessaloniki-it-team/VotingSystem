@@ -8,6 +8,13 @@ class VotesDB:
         self.db = self.client.votesDB
 
     def createVote(self, user_id: str, poll_id: str, chosen_option: int) -> VotesWrapper:
+        """
+        Creates a new Vote with user_id, poll_id and option selected
+        :param user_id
+        :param poll_id
+        :param chosen_option
+        :return: VotesWrapper
+        """
         try:
 
             vote: Vote = Vote(user_id, poll_id, chosen_option)  # timestamp will be created automatically
@@ -18,11 +25,10 @@ class VotesDB:
 
     def getAllVotes(self, poll_id: str, named: bool, after_timestamp=0) -> VotesWrapper:
         """
-
-        :param poll_id:
-        :param after_timestamp:
-        :return: All the votes for this poll_id, divided into options. If named is true then pass into the wrapper
-        the user_id, else pass only the numbers. Make sure to set named in wrapper
+        Gets all the votes for this poll_id, divided into options.
+        :param poll_id
+        :param after_timestamp
+        :return: VotesWrapper
         """
         try:
 
@@ -40,9 +46,14 @@ class VotesDB:
             if not named:
                 voteDict = {option: len(userlist) for option, userlist in voteDict.items()}
             return VotesWrapper(after_timestamp, voteDict, named=named, found=True, userFound=True,
-                                operationDone=True)  # TODO: named? you get it from poll_id -> pollDB
+                                operationDone=True)
         except:
             return VotesWrapper(None, {})
 
     def deleteVote(self, poll_id):
+        """
+        Deletes a vote with poll_id
+        :param poll_id
+        :return: boolean
+        """
         return bool(self.db.delete_many({"poll_id":poll_id}).deleted_count)

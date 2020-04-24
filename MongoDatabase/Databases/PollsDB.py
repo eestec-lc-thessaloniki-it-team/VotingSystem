@@ -12,8 +12,8 @@ class PollsDB:
     def _findPollById(self, poll_id: str) -> Optional[Poll]:
         """
         Finds a poll with poll_id
-        :param poll_id:
-        :return:
+        :param poll_id
+        :return: Poll object
         """
         try:
             jsonReturned = self.db.find_one({"_id":poll_id})
@@ -28,12 +28,12 @@ class PollsDB:
     def createPoll(self, question: str, options: List[str], named: bool, unique: bool, user_id: str) -> PollWrapper:
         """
         Creates a new Poll
-        :param user:
-        :param question:
-        :param options:
-        :param named:
-        :param unique:
-        :param session_id:
+        :param user
+        :param question
+        :param options
+        :param named
+        :param unique
+        :param session_id
         :return: PollWrapper
         """
         try:
@@ -45,8 +45,9 @@ class PollsDB:
 
     def getPollById(self, poll_id: str) -> PollWrapper:
         """
-        :param poll_id:
-        :return:
+        Gets a Poll with poll_id
+        :param poll_id
+        :return: PollWrapper
         """
         try:
             poll: Poll = self._findPollById(poll_id)
