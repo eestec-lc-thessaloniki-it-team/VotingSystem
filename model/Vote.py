@@ -6,7 +6,7 @@ class Vote:
         self.user_id = user_id
         self.poll_id = poll_id
         self.chosen_option = chosen_option
-        self.timestamp = datetime.now()
+        self.timestamp = datetime.now().timestamp() # o alex to ekane
 
     def __eq__(self, other):
         return(
