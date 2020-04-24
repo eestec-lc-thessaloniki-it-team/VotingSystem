@@ -18,7 +18,7 @@ class UserDB:
         """
 
         :param mail:
-        :return:
+        :return: the user with this email or None if not found
         """
         try:
             jsonReturned = self.db.find_one({"mail": mail})
@@ -36,9 +36,11 @@ class UserDB:
         :return: the user object, the user_id from mongo
         """
         jsonReturned = self.db.find_one({"session_id": session_id})
-        object = getUserFromJson(jsonReturned)
-        return (object, str(jsonReturned["_id"]))
-        
+        if jsonReturned:
+            object = getUserFromJson(jsonReturned)
+            return object, str(jsonReturned["_id"])
+        else:
+            return None, ""
 
     def createNewUser(self, name: str, mail: str, password: str) -> UserWrapper:
         """
@@ -49,14 +51,12 @@ class UserDB:
         """
         _user = self._findUserByMail(mail)
         if _user:
-            return UserWrapper(_user, True, True, False)
-
-        # TODO: check if mail already exists DONE
+            return UserWrapper(None, found=True, userFound=True,
+                               operationDone=False)  # Dont return saved user when find it in db
 
         user: User = User(name, mail, password)
         self.db.insert_one(user.makeJson())
-        # Todo: persist it to database
-        return UserWrapper(user, False, False, True) # false???
+        return UserWrapper(user, found=False, userFound=False, operationDone=True)
 
     def logInUser(self, mail: str, password: str) -> UserWrapper:
         """
@@ -66,14 +66,13 @@ class UserDB:
         :return:
         """
         user: User = self._findUserByMail(mail)
-        # TODO: check if user is not None else return found=false
-        if user is None:
-            return UserWrapper(None)
+        if not user:
+            return UserWrapper(None, found=False, userFound=False, operationDone=False)
         if user.verify_password(password):
             user.createSessionId()  # This will update session id
             return self.updateUser(user)
-        # Todo: return userWrapper with operation=false
-        return UserWrapper(user, True, True, False)
+        return UserWrapper(None, found=True, userFound=True,
+                           operationDone=False)  # Don't return it if gave wrong password
 
     def updateUser(self, newUser: User) -> UserWrapper:
         """
@@ -81,10 +80,21 @@ class UserDB:
         :param newUser:
         :return:
         """
-        # TODO: persist new user in database
-        # TODO: check if everything is ok and return it
-        returned = self.db.update_one({"mail": newUser.mail}, {'$set': newUser.makeJson()})
-        return UserWrapper(newUser, True, True, bool(returned.matched_count))
+        try:
+            returned = self.db.update_one({"mail": newUser.mail}, {'$set': newUser.makeJson()})
+            return UserWrapper(newUser, found=True, userFound=True, operationDone=bool(returned.matched_count))
+        except:
+            return UserWrapper(newUser, found=False, userFound=False, operationDone=False)
+
+    def deleteUser(self, mail: str) -> UserWrapper:
+        _user = self._findUserByMail(mail)
+        if not _user:  # didnt find it
+            return UserWrapper(None, found=False, userFound=False, operationDone=False)
+        try:
+            returned = self.db.delete_many({'mail': mail})
+            return UserWrapper(None, found=False, userFound=False, operationDone=bool(returned.deleted_count))
+        except:
+            return UserWrapper(None, found=False, userFound=False, operationDone=False)
 
     def fillUsernames(self, votesWrapper: VotesWrapper) -> VotesWrapper:
         """
