@@ -47,13 +47,14 @@ def getPollByID():
     We want session_id in request
     :return:
     """
-    # TODO: this will call getPollById from MongoDB and take care for all the possible wrapper context
     try:
         poll_id = request.args.get("id")
         session_id = request.json.get("session_id")
-        poll_wrapper: PollWrapper = getPollFromJson(database.getPollById(poll_id, session_id))
+        poll_wrapper: PollWrapper = database.getPollById(poll_id, session_id)
         if not poll_wrapper.userFound:
             return jsonify(response=400, msg="Could not find user with session_id: " + session_id)
+        if not poll_wrapper.found:
+            return jsonify(response=404, msg="Could not find poll with id: "+poll_id)
         return jsonify(response=200, wrapper=poll_wrapper)
     except:
         return jsonify(response=500, msg="Something went wrong")
