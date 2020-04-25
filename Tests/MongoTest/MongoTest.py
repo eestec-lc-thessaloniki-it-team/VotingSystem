@@ -162,6 +162,30 @@ class MongoTest(unittest.TestCase):
         self.assertEqual(len(votesWrapper.votes), 2)  # and one in the setUp
         self.assertEqual(votesWrapper.votes.get(0)[0], self.user.name)
 
+    def test_results(self):
+        """
+        we ask the votes for a poll. User1 for poll1, we give wrong session id, wrong poll id and then all correct
+        without timestamp and with timestamp
+        """
+        votesWrapper: VotesWrapper = self.connection.results("wrong_poll_id", 0, "wrong_session_id")
+        self.assertFalse(votesWrapper.operationDone)
+        self.assertFalse(votesWrapper.userFound)
+        self.assertFalse(votesWrapper.found)
+        votesWrapper: VotesWrapper = self.connection.results("wrong_poll_id", 0, self.session_id)
+        self.assertFalse(votesWrapper.operationDone)
+        self.assertTrue(votesWrapper.userFound)
+        self.assertFalse(votesWrapper.found)
+        votesWrapper: VotesWrapper = self.connection.results(self.poll_id, 0, self.session_id)
+        self.assertTrue(votesWrapper.operationDone)
+        self.assertTrue(votesWrapper.userFound)
+        self.assertTrue(votesWrapper.found)
+        lastTimestamp = votesWrapper.lastTimestamp
+        votesWrapper: VotesWrapper = self.connection.results(self.poll_id, lastTimestamp, self.session_id)
+        self.assertTrue(votesWrapper.operationDone)
+        self.assertEqual(len(votesWrapper.votes), 0)
+        self.assertTrue(votesWrapper.userFound)
+        self.assertTrue(votesWrapper.found)
+
     def tearDown(self) -> None:
         user: UserWrapper = self.connection.userDB.deleteUser(self.user.mail)
         self.assertTrue(user.operationDone)

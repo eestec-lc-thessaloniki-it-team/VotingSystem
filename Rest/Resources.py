@@ -2,7 +2,7 @@ import os
 
 import flask
 from flask import request, jsonify
-
+from datetime import datetime
 from MongoDatabase.MongoDB import MongoDB
 from MongoDatabase.Wrappers import UserWrapper
 from MongoDatabase.Wrappers.PollWrapper import PollWrapper
@@ -116,13 +116,12 @@ def vote():
 @app.route("/results")  # This function will use parameters in url
 def results():
     """
-    In request we want session_id, last_timestamp
+    In request we want session_id, last_timestamp in format
     :return:
     """
-    # TODO: this will call results from MongoDB and take care for all the possible wrapper context
     try:
         poll_id = request.args.get("id")
-        last_timestamp = request.json.get("last_timestamp")
+        last_timestamp = request.json.get("last_timestamp") # this will be in a format
         session_id = request.json.get("session_id")
         votes_wrapper: VotesWrapper = database.results(poll_id, last_timestamp, session_id)
         if not votes_wrapper.userFound:

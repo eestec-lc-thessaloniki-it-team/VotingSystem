@@ -1,5 +1,6 @@
 # import sys
 # sys.path.append("C:\\Users\\fotin\\OneDrive\\Documents\\VotingSystem")
+from datetime import datetime
 from typing import List
 
 from pymongo import MongoClient
@@ -103,12 +104,21 @@ class MongoDB:
         (user, user_id) = self.userDB.getUserWithSessionId(session_id)
         if user is None:
             return VotesWrapper("", {}, named=False, found=False, userFound=False, operationDone=False)
-        named = self.pollsDB.getPollById(poll_id).object.named
-        votesWrapper: VotesWrapper = self.votesDB.getAllVotes(poll_id, named, after_timestamp)
-        if votesWrapper.named:
-            return self.userDB.fillUsernames(votesWrapper)
+        poll: PollWrapper = self.pollsDB.getPollById(poll_id)
+        if not poll.found:
+            return VotesWrapper("", {}, named=False, found=False, userFound=True, operationDone=False)
+        # makeTimestamp
+        if after_timestamp != 0:
+            dateTimeObject = datetime.strptime(after_timestamp, "%Y-%m-%d %H:%M:%S.%f")
+            votesWrapper: VotesWrapper = self.votesDB.getAllVotes(poll_id, poll.object.named,
+                                                                  dateTimeObject.timestamp())
         else:
+            votesWrapper: VotesWrapper = self.votesDB.getAllVotes(poll_id, poll.object.named, 0)
+        votesWrapper.lastTimestamp = str(datetime.fromtimestamp(votesWrapper.lastTimestamp))
+        if not votesWrapper.named or len(votesWrapper.votes) == 0:
             return votesWrapper
+        else:
+            return self.userDB.fillUsernames(votesWrapper)
 
 # PRINT TESTS
 #

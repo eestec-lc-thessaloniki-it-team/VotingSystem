@@ -37,11 +37,13 @@ class VotesDB:
                 voteList = [getVoteFromJson(voteJson) for voteJson in
                             self.db.find({"timestamp": {"$gt": after_timestamp}})
                             if getVoteFromJson(voteJson).poll_id == poll_id]
+                if not voteList:
+                    return VotesWrapper(after_timestamp, {}, named=named, found=True, userFound=True, operationDone=True)
             else:
                 voteList = [getVoteFromJson(voteJson) for voteJson in self.db.find()
                             if getVoteFromJson(voteJson).poll_id == poll_id]
-            if not voteList:
-                return VotesWrapper(0, {}, named=named, found=False, userFound=False, operationDone=False)
+                if not voteList:
+                    return VotesWrapper(0, {}, named=named, found=False, userFound=False, operationDone=False)
             latestTimestamp = 0
             for vote in voteList:
                 if vote.timestamp > latestTimestamp:
