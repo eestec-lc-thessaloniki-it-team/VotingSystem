@@ -133,7 +133,7 @@ def results():
         return jsonify(response=500, msg="Something went wrong")
 
 
-@app.route("isValid-session")
+@app.route("/isValid-session")
 def validateSession():
     """
     Request will send a session-id and return if is valid
@@ -144,3 +144,7 @@ def validateSession():
         return jsonify(response=200, isValid=isValid)
     except:
         return jsonify(response=500, msg="Something went wrong")
+
+
+if __name__ == '__main__':
+    app.run()

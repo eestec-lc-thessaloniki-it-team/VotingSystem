@@ -122,7 +122,7 @@ class MongoDB:
 
     def checkIfValidSessionId(self, session_id: str) -> bool:
         (user, user_id) = self.userDB.getUserWithSessionId(session_id)
-        return user is None
+        return user is not None
 
 # PRINT TESTS
 #
