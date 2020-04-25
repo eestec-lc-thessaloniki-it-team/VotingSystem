@@ -75,9 +75,9 @@ class MongoTest(unittest.TestCase):
         """
         userWrapper: UserWrapper = self.connection.logIn("forget@mail.com", "12345")
         self.assertFalse(userWrapper.operationDone)
-        self.assertFalse(userWrapper.found)
+        self.assertFalse(userWrapper.userFound)
         userWrapper: UserWrapper = self.connection.logIn(self.user2.mail, "forgotPass")
-        self.assertTrue(userWrapper.found)
+        self.assertTrue(userWrapper.userFound)
         self.assertFalse(userWrapper.operationDone)
         userWrapper: UserWrapper = self.connection.logIn(self.user2.mail, self.user2.password)
         self.assertTrue(userWrapper.operationDone)

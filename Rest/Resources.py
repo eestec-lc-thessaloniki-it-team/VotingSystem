@@ -1,11 +1,11 @@
-import flask, os
+import flask
+import os
 from flask import request, jsonify
 
 from MongoDatabase.MongoDB import MongoDB
 from MongoDatabase.Wrappers import UserWrapper
 from MongoDatabase.Wrappers.PollWrapper import PollWrapper
 from MongoDatabase.Wrappers.VotesWrapper import VotesWrapper
-from model.Poll import getPollFromJson
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
@@ -20,18 +20,17 @@ def logIn():
     :return: response + wrapper if is ok
     """
     try:
+
         mail = request.json.get("mail")
         password = request.json.get("password")
         user_wrapper: UserWrapper = database.logIn(mail, password)
-        if not user_wrapper.userFound:
-            return jsonify(response=400, msg="Could not find user with this password")
-        if not user_wrapper.found:
-            return jsonify(response=404, msg="Could not find user with this mail: " + mail)
+        if not user_wrapper.userFound:  # could not find the user
+            return jsonify(response=400, msg="Could not find user with this mail: " + mail)
+        if not user_wrapper.operationDone:  # miss match password
+            return jsonify(response=404, msg="Could not find user with this password")
         return jsonify(response=200, wrapper=user_wrapper)
     except:
         return jsonify(response=500, msg="Something went wrong")
-
-
 
 
 @app.route("/register", methods=['POST'])
@@ -68,9 +67,10 @@ def createPoll():
         poll_wrapper: PollWrapper = database.createPoll(question, options, named, unique, session_id)
         if not poll_wrapper.userFound:
             return jsonify(response=400, msg="Could not find user with session_id: " + session_id)
-        return jsonify(response=200) #shared link
+        return jsonify(response=200)  # shared link
     except:
         return jsonify(response=500, msg="Something went wrong")
+
 
 @app.route("/poll", methods=['GET'])  # This function will use parameters in url
 def getPollByID():
