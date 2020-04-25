@@ -1,16 +1,17 @@
 # import sys
 # sys.path.append("C:\\Users\\fotin\\OneDrive\\Documents\\VotingSystem")
-from datetime import datetime
 from typing import List
+
 from pymongo import MongoClient
-from model.User import User
-from MongoDatabase.user import * # get credentials
-from MongoDatabase.Databases.UserDB import UserDB
+
 from MongoDatabase.Databases.PollsDB import PollsDB
+from MongoDatabase.Databases.UserDB import UserDB
 from MongoDatabase.Databases.VotesDB import VotesDB
-from MongoDatabase.Wrappers.UserWrapper import UserWrapper
 from MongoDatabase.Wrappers.PollWrapper import PollWrapper
+from MongoDatabase.Wrappers.UserWrapper import UserWrapper
 from MongoDatabase.Wrappers.VotesWrapper import VotesWrapper
+from MongoDatabase.user import *  # get credentials
+
 
 class MongoDB:
     """
@@ -81,7 +82,11 @@ class MongoDB:
         (user, user_id) = self.userDB.getUserWithSessionId(session_id)
         if user is None:
             return VotesWrapper("", {}, named=False, found=False, userFound=False, operationDone=False)
-        votesWrapper: VotesWrapper = self.votesDB.createVote(poll_id, user_id, chosen_option)
+        poll: PollWrapper = self.pollsDB.getPollById(poll_id)
+        if not poll.found:
+            return VotesWrapper("", {}, named=False, found=False, userFound=True, operationDone=False)
+        votesWrapper: VotesWrapper = self.votesDB.createVote(user_id, poll_id, poll.object.named,
+                                                             chosen_option)
         if votesWrapper.named:
             return self.userDB.fillUsernames(votesWrapper)
         else:
@@ -99,12 +104,11 @@ class MongoDB:
         if user is None:
             return VotesWrapper("", {}, named=False, found=False, userFound=False, operationDone=False)
         named = self.pollsDB.getPollById(poll_id).object.named
-        votesWrapper: VotesWrapper=self.votesDB.getAllVotes(poll_id,named,after_timestamp)
+        votesWrapper: VotesWrapper = self.votesDB.getAllVotes(poll_id, named, after_timestamp)
         if votesWrapper.named:
             return self.userDB.fillUsernames(votesWrapper)
         else:
             return votesWrapper
-
 
 # PRINT TESTS
 #

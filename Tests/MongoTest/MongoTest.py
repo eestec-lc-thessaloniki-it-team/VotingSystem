@@ -20,6 +20,9 @@ class MongoTest(unittest.TestCase):
         self.user2: User = User("charis", "charis@mail.mail", "12345")
         self.user3: User = User("Stef", "stef@mail.mail", "asdf")
 
+        # user: UserWrapper = self.connection.userDB.deleteUser(self.user.mail)
+        # user2: UserWrapper = self.connection.userDB.deleteUser(self.user2.mail)
+
         userWrapper: UserWrapper = self.connection.userDB.createNewUser(self.user.name, self.user.mail,
                                                                         self.user.password)
         self.assertIsNotNone(userWrapper.object)
@@ -126,7 +129,7 @@ class MongoTest(unittest.TestCase):
         self.assertFalse(pollWrapper.operationDone)
         self.assertFalse(pollWrapper.userFound)
         self.assertFalse(pollWrapper.found)
-        pollWrapper: PollWrapper = self.connection.getPollById(self.poll_id, "WrongSessionId") # first checks user
+        pollWrapper: PollWrapper = self.connection.getPollById(self.poll_id, "WrongSessionId")  # first checks user
         self.assertFalse(pollWrapper.operationDone)
         self.assertFalse(pollWrapper.userFound)
         self.assertFalse(pollWrapper.found)
@@ -138,6 +141,26 @@ class MongoTest(unittest.TestCase):
         self.assertTrue(pollWrapper.operationDone)
         self.assertTrue(pollWrapper.userFound)
         self.assertTrue(pollWrapper.found)
+
+    def test_vote(self):
+        """
+        Vote will be made from User 1 to poll 1. First wrong session, then wrong poll id then correct
+        :return:
+        """
+        votesWrapper: VotesWrapper = self.connection.vote("wrong_poll_id", 0, "wrong_session_id")
+        self.assertFalse(votesWrapper.operationDone)
+        self.assertFalse(votesWrapper.userFound)
+        self.assertFalse(votesWrapper.found)
+        votesWrapper: VotesWrapper = self.connection.vote("wrong_poll_id", 0, self.session_id)
+        self.assertFalse(votesWrapper.operationDone)
+        self.assertTrue(votesWrapper.userFound)
+        self.assertFalse(votesWrapper.found)
+        votesWrapper: VotesWrapper = self.connection.vote(self.poll_id, 1, self.session_id)
+        self.assertTrue(votesWrapper.operationDone)
+        self.assertTrue(votesWrapper.userFound)
+        self.assertTrue(votesWrapper.found)
+        self.assertEqual(len(votesWrapper.votes), 2)  # and one in the setUp
+        self.assertEqual(votesWrapper.votes.get(0)[0], self.user.name)
 
     def tearDown(self) -> None:
         user: UserWrapper = self.connection.userDB.deleteUser(self.user.mail)
