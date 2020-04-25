@@ -25,9 +25,9 @@ def logIn():
         password = request.json.get("password")
         user_wrapper: UserWrapper = database.logIn(mail, password)
         if not user_wrapper.userFound:  # could not find the user
-            return jsonify(response=400, msg="Could not find user with this mail: " + mail)
+            return jsonify(response=404, msg="Could not find user with this mail: " + mail)
         if not user_wrapper.operationDone:  # miss match password
-            return jsonify(response=404, msg="Could not find user with this password")
+            return jsonify(response=400, msg="Could not find user with this password")
         return jsonify(response=200, wrapper=user_wrapper)
     except:
         return jsonify(response=500, msg="Something went wrong")
@@ -44,7 +44,7 @@ def register():
         mail = request.json.get("mail")
         password = request.json.get("password")
         user_wrapper: UserWrapper = database.register(name, mail, password)
-        if not user_wrapper.userFound:
+        if user_wrapper.userFound:
             return jsonify(response=400, msg="This E-mail already exists" + mail)
         return jsonify(response=200, wrapper=user_wrapper)
     except:

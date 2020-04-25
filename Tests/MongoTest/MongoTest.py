@@ -89,6 +89,16 @@ class MongoTest(unittest.TestCase):
         A new user, user3 is trying to register to our system. First uses a mail that has used before, but then
         creates a new user successfully
         """
+        userWrapper: UserWrapper = self.connection.register(self.user3.name, self.user.mail, self.user3.password)
+        self.assertFalse(userWrapper.operationDone)
+        self.assertTrue(userWrapper.userFound)
+        userWrapper: UserWrapper = self.connection.register(self.user3.name, self.user3.mail, self.user3.password)
+        self.assertTrue(userWrapper.operationDone)
+        self.assertIsNotNone(userWrapper.object)
+
+        # delete it afterwards
+        userWrapper: UserWrapper = self.connection.userDB.deleteUser(self.user3.mail)
+        self.assertTrue(userWrapper.operationDone)
 
     def tearDown(self) -> None:
         user: UserWrapper = self.connection.userDB.deleteUser(self.user.mail)
