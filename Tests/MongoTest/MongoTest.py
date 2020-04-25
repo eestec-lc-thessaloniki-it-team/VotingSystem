@@ -100,6 +100,24 @@ class MongoTest(unittest.TestCase):
         userWrapper: UserWrapper = self.connection.userDB.deleteUser(self.user3.mail)
         self.assertTrue(userWrapper.operationDone)
 
+    def test_create_poll(self):
+        """
+        User1 will try to create a poll. First he is not connected, so no session_id is given. Then complete it
+        :return:
+        """
+        poll: Poll = Poll("how cool are we?", ["A lot", "A lot but second", "same as 2"], named=False,
+                          unique=True,
+                          creator_user_id=self.user_id)
+        pollWrapper: PollWrapper = self.connection.createPoll(poll.question, poll.options, poll.named, poll.unique, "")
+        self.assertFalse(pollWrapper.operationDone)
+        self.assertFalse(pollWrapper.userFound)
+
+        pollWrapper: PollWrapper = self.connection.createPoll(poll.question, poll.options, poll.named, poll.unique,
+                                                              self.session_id)
+        self.assertTrue(pollWrapper.operationDone)
+        self.assertTrue(pollWrapper.userFound)
+        self.assertEqual(pollWrapper.object.question,poll.question)
+
     def tearDown(self) -> None:
         user: UserWrapper = self.connection.userDB.deleteUser(self.user.mail)
         self.assertTrue(user.operationDone)

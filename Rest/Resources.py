@@ -1,5 +1,6 @@
-import flask
 import os
+
+import flask
 from flask import request, jsonify
 
 from MongoDatabase.MongoDB import MongoDB
@@ -57,7 +58,6 @@ def createPoll():
     In request we want : question, options , named, unique and session id
     :return:
     """
-    # TODO: this will call createPoll from MongoDB and take care for all the possible wrapper context
     try:
         question = request.json.get("question")
         options = request.json.get("options_list")
@@ -67,7 +67,9 @@ def createPoll():
         poll_wrapper: PollWrapper = database.createPoll(question, options, named, unique, session_id)
         if not poll_wrapper.userFound:
             return jsonify(response=400, msg="Could not find user with session_id: " + session_id)
-        return jsonify(response=200)  # shared link
+        # at this point we know the poll id, in wrapper
+        return jsonify(response=200,
+                       sharedLink="/poll?poll_id=" + poll_wrapper.pollId)  # shared link might need to change
     except:
         return jsonify(response=500, msg="Something went wrong")
 
