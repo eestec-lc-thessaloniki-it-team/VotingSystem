@@ -92,6 +92,9 @@ class VotesDBTest(unittest.TestCase):
         poll = self.connection.pollsDB.deletePollById(poll_id=self.poll_id)
         self.assertTrue(poll.operationDone)
         self.assertTrue(self.connection.votesDB.deleteVote(self.poll_id))
+        poll2 = self.connection.pollsDB.deletePollById(poll_id=self.poll_id2)
+        self.assertTrue(poll2.operationDone)
+        self.assertTrue(self.connection.votesDB.deleteVote(self.poll_id2))
 
 
 if __name__ == '__main__':
