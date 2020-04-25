@@ -120,6 +120,10 @@ class MongoDB:
         else:
             return self.userDB.fillUsernames(votesWrapper)
 
+    def checkIfValidSessionId(self, session_id: str) -> bool:
+        (user, user_id) = self.userDB.getUserWithSessionId(session_id)
+        return user is None
+
 # PRINT TESTS
 #
 # my_db = MongoDB()

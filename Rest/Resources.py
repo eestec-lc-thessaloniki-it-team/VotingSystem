@@ -2,7 +2,7 @@ import os
 
 import flask
 from flask import request, jsonify
-from datetime import datetime
+
 from MongoDatabase.MongoDB import MongoDB
 from MongoDatabase.Wrappers import UserWrapper
 from MongoDatabase.Wrappers.PollWrapper import PollWrapper
@@ -66,7 +66,7 @@ def createPoll():
         session_id = request.json.get("session_id")
         poll_wrapper: PollWrapper = database.createPoll(question, options, named, unique, session_id)
         if not poll_wrapper.userFound:
-            return jsonify(response=400, msg="Could not find user with session_id: " + session_id)
+            return jsonify(response=401, msg="Could not find user with session_id: " + session_id)
         # at this point we know the poll id, in wrapper
         return jsonify(response=200,
                        sharedLink="/poll?poll_id=" + poll_wrapper.pollId)  # shared link might need to change
@@ -85,7 +85,7 @@ def getPollByID():
         session_id = request.json.get("session_id")
         poll_wrapper: PollWrapper = database.getPollById(poll_id, session_id)
         if not poll_wrapper.userFound:
-            return jsonify(response=400, msg="Could not find user with session_id: " + session_id)
+            return jsonify(response=401, msg="Could not find user with session_id: " + session_id)
         if not poll_wrapper.found:
             return jsonify(response=404, msg="Could not find poll with id: " + poll_id)
         return jsonify(response=200, wrapper=poll_wrapper)
@@ -105,7 +105,7 @@ def vote():
         chosen_option = request.json.get("chosen_option")
         vote_wrapper: VotesWrapper = database.vote(poll_id, chosen_option, session_id)
         if not vote_wrapper.userFound:
-            return jsonify(response=400, msg="Could not find user with session_id: " + session_id)
+            return jsonify(response=401, msg="Could not find user with session_id: " + session_id)
         if not vote_wrapper.found:
             return jsonify(response=404, msg="Could not find vote with id: " + poll_id)
         return jsonify(response=200, wrapper=vote_wrapper)
@@ -121,13 +121,26 @@ def results():
     """
     try:
         poll_id = request.args.get("id")
-        last_timestamp = request.json.get("last_timestamp") # this will be in a format
+        last_timestamp = request.json.get("last_timestamp")  # this will be in a format
         session_id = request.json.get("session_id")
         votes_wrapper: VotesWrapper = database.results(poll_id, last_timestamp, session_id)
         if not votes_wrapper.userFound:
-            return jsonify(response=400, msg="Could not find user with session_id: " + session_id)
+            return jsonify(response=401, msg="Could not find user with session_id: " + session_id)
         if not votes_wrapper.found:
             return jsonify(response=404, msg="Could not find poll with id: " + poll_id)
         return jsonify(response=200, wrapper=votes_wrapper)
     except:
-        return jsonify(response=500, msg="Some`thing went wrong")
+        return jsonify(response=500, msg="Something went wrong")
+
+
+@app.route("isValid-session")
+def validateSession():
+    """
+    Request will send a session-id and return if is valid
+    :return:
+    """
+    try:
+        isValid = database.checkIfValidSessionId(request.json.get("session_id"))
+        return jsonify(response=200, isValid=isValid)
+    except:
+        return jsonify(response=500, msg="Something went wrong")
