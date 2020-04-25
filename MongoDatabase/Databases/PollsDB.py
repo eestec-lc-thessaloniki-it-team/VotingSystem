@@ -54,9 +54,9 @@ class PollsDB:
             poll: Poll = self._findPollById(poll_id)
             if poll:
                 return PollWrapper(poll, poll_id, found=True, userFound=True, operationDone=True)
-            return PollWrapper(poll, poll_id, found=False, userFound=False, operationDone=False)
+            return PollWrapper(poll, poll_id, found=False, userFound=True, operationDone=False)
         except:
-            return PollWrapper(None, None, found=False, userFound=False, operationDone=False)
+            return PollWrapper(None, None, found=False, userFound=True, operationDone=False)
 
     def deletePollById(self, poll_id: str) -> PollWrapper:
         """

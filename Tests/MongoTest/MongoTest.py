@@ -116,7 +116,28 @@ class MongoTest(unittest.TestCase):
                                                               self.session_id)
         self.assertTrue(pollWrapper.operationDone)
         self.assertTrue(pollWrapper.userFound)
-        self.assertEqual(pollWrapper.object.question,poll.question)
+        self.assertEqual(pollWrapper.object.question, poll.question)
+
+    def test_get_poll_by_id(self):
+        """
+            Trying to get a poll with wrong session_id, then with wrong poll id and at last take it correctly
+        """
+        pollWrapper: PollWrapper = self.connection.getPollById("wrongPollId", "WrongSessionId")
+        self.assertFalse(pollWrapper.operationDone)
+        self.assertFalse(pollWrapper.userFound)
+        self.assertFalse(pollWrapper.found)
+        pollWrapper: PollWrapper = self.connection.getPollById(self.poll_id, "WrongSessionId") # first checks user
+        self.assertFalse(pollWrapper.operationDone)
+        self.assertFalse(pollWrapper.userFound)
+        self.assertFalse(pollWrapper.found)
+        pollWrapper: PollWrapper = self.connection.getPollById("wrongPollId", self.session_id)
+        self.assertFalse(pollWrapper.operationDone)
+        self.assertTrue(pollWrapper.userFound)
+        self.assertFalse(pollWrapper.found)
+        pollWrapper: PollWrapper = self.connection.getPollById(self.poll_id, self.session_id)
+        self.assertTrue(pollWrapper.operationDone)
+        self.assertTrue(pollWrapper.userFound)
+        self.assertTrue(pollWrapper.found)
 
     def tearDown(self) -> None:
         user: UserWrapper = self.connection.userDB.deleteUser(self.user.mail)
