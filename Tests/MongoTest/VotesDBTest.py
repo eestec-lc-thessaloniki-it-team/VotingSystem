@@ -15,11 +15,6 @@ class VotesDBTest(unittest.TestCase):
         self.user: User = User("mavroudo", "mail@mail.mail", "1234")
         self.user2: User = User("charis", "charis@mail.mail", "12345")
 
-        # user: UserWrapper = self.connection.userDB.deleteUser(self.user.mail)
-        # self.assertTrue(user.operationDone)
-        # user2: UserWrapper = self.connection.userDB.deleteUser(self.user2.mail)
-        # self.assertTrue(user2.operationDone)
-
         userWrapper: UserWrapper = self.connection.userDB.createNewUser(self.user.name, self.user.mail,
                                                                         self.user.password)
         self.assertIsNotNone(userWrapper.object)
