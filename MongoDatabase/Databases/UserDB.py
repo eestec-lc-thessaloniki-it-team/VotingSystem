@@ -16,9 +16,9 @@ class UserDB:
 
     def _findUserByMail(self, mail: str) -> Optional[User]:
         """
-
-        :param mail:
-        :return: the user with this email or None if not found
+        Finds a user with mail
+        :param mail
+        :return: User object
         """
         try:
             jsonReturned = self.db.find_one({"mail": mail})
@@ -31,23 +31,27 @@ class UserDB:
 
     def getUserWithSessionId(self, session_id: str) -> (Optional[User], str):
         """
-
-        :param session_id:
-        :return: the user object, the user_id from mongo
+        Gets user with session_id
+        :param session_id
+        :return: user object, user_id
         """
-        jsonReturned = self.db.find_one({"session_id": session_id})
-        if jsonReturned:
-            object = getUserFromJson(jsonReturned)
-            return object, str(jsonReturned["_id"])
-        else:
+        try:
+            jsonReturned = self.db.find_one({"session_id": session_id})
+            if jsonReturned:
+                object = getUserFromJson(jsonReturned)
+                return object, str(jsonReturned["_id"])
+            else:
+                return None, ""
+        except:
             return None, ""
 
     def createNewUser(self, name: str, mail: str, password: str) -> UserWrapper:
         """
-        :param name:
-        :param mail:
-        :param password:
-        :return:
+        Creates a user with name, mail and password
+        :param name
+        :param mail
+        :param password
+        :return: UserWrapper
         """
         _user = self._findUserByMail(mail)
         if _user:
@@ -60,10 +64,10 @@ class UserDB:
 
     def logInUser(self, mail: str, password: str) -> UserWrapper:
         """
-
-        :param mail:
-        :param password:
-        :return:
+        Returns a UserWrapper with mail and password
+        :param mail
+        :param password
+        :return: UserWrapper
         """
         user: User = self._findUserByMail(mail)
         if not user:
@@ -72,13 +76,13 @@ class UserDB:
             user.createSessionId()  # This will update session id
             return self.updateUser(user)
         return UserWrapper(None, found=True, userFound=True,
-                           operationDone=False)  # Don't return it if gave wrong password
+                           operationDone=False)
 
     def updateUser(self, newUser: User) -> UserWrapper:
         """
-        Save the new instance in the database and return in wrapper
-        :param newUser:
-        :return:
+        Saves the new instance in the database
+        :param newUser
+        :return: UserWrapper
         """
         try:
             returned = self.db.update_one({"mail": newUser.mail}, {'$set': newUser.makeJson()})
@@ -87,8 +91,13 @@ class UserDB:
             return UserWrapper(newUser, found=False, userFound=False, operationDone=False)
 
     def deleteUser(self, mail: str) -> UserWrapper:
+        """
+        Deletes a User with inserted mail
+        :param mail:
+        :return: UserWrapper
+        """
         _user = self._findUserByMail(mail)
-        if not _user:  # didnt find it
+        if not _user:
             return UserWrapper(None, found=False, userFound=False, operationDone=False)
         try:
             returned = self.db.delete_many({'mail': mail})
@@ -98,8 +107,17 @@ class UserDB:
 
     def fillUsernames(self, votesWrapper: VotesWrapper) -> VotesWrapper:
         """
-        This function will get the user_ids for everyone and change it with their names from the database
+        Gets the user_ids for everyone and change it with their names from the database
         :param votesWrapper:
-        :return: Return the wrapper that now contain the names
+        :return: VotesWrapper
         """
-        return VotesWrapper()
+        if votesWrapper.votes:
+            for option,userList in votesWrapper.votes.items():
+                if type(userList) is not list:
+                    raise ValueError("Dict must contain only list values")
+            votesDict = {option:list() for option in votesWrapper.votes}
+            for option, userList in votesWrapper.votes.items():
+                votesDict[option] = [getUserFromJson(self.db.find_one({"_id": ObjectId(user_id)})).name for user_id in userList]
+            return VotesWrapper(votesWrapper.lastTimestamp, votesDict, found=votesWrapper.found,
+                                userFound=votesWrapper.userFound, operationDone=votesWrapper.operationDone)
+        return VotesWrapper(votesWrapper.lastTimestamp, {}, found=False, userFound=False, operationDone=False)
