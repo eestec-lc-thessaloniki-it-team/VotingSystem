@@ -2,12 +2,13 @@ from MongoDatabase.Wrappers.VotesWrapper import VotesWrapper
 from model.Vote import Vote
 from model.Vote import getVoteFromJson
 
+
 class VotesDB:
     def __init__(self, client):
         self.client = client
         self.db = self.client.votesDB
 
-    def createVote(self, user_id: str, poll_id: str, chosen_option: int) -> VotesWrapper:
+    def createVote(self, user_id: str, poll_id: str, named: bool, chosen_option: int) -> VotesWrapper:
         """
         Creates a new Vote with user_id, poll_id and option selected
         :param user_id
@@ -19,7 +20,7 @@ class VotesDB:
 
             vote: Vote = Vote(user_id, poll_id, chosen_option)  # timestamp will be created automatically
             self.db.insert_one(vote.makeJson())
-            return self.getAllVotes(poll_id)
+            return self.getAllVotes(poll_id, named)
         except:
             return VotesWrapper(None, {})
 
@@ -39,7 +40,8 @@ class VotesDB:
             else:
                 voteList = [getVoteFromJson(voteJson) for voteJson in self.db.find()
                             if getVoteFromJson(voteJson).poll_id == poll_id]
-
+            if not voteList:
+                return VotesWrapper(0, {}, named=named, found=False, userFound=False, operationDone=False)
             voteDict = {vote.chosen_option: list() for vote in voteList}
             for vote in voteList:
                 voteDict[vote.chosen_option].append(vote.user_id)
@@ -56,4 +58,4 @@ class VotesDB:
         :param poll_id
         :return: boolean
         """
-        return bool(self.db.delete_many({"poll_id":poll_id}).deleted_count)
+        return bool(self.db.delete_many({"poll_id": poll_id}).deleted_count)
