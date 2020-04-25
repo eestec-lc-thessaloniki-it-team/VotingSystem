@@ -2,6 +2,7 @@ import os
 
 import flask
 from flask import request, jsonify
+from flask_cors import CORS
 
 from MongoDatabase.MongoDB import MongoDB
 from MongoDatabase.Wrappers import UserWrapper
@@ -9,6 +10,7 @@ from MongoDatabase.Wrappers.PollWrapper import PollWrapper
 from MongoDatabase.Wrappers.VotesWrapper import VotesWrapper
 
 app = flask.Flask(__name__)
+CORS(app)
 app.config["DEBUG"] = True
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 database = MongoDB()
@@ -140,7 +142,7 @@ def validateSession():
     :return:
     """
     try:
-        isValid = database.checkIfValidSessionId(request.json.get("session_id"))
+        isValid = database.checkIfValidSessionId(request.args.get("session_id"))
         return jsonify(response=200, isValid=isValid)
     except:
         return jsonify(response=500, msg="Something went wrong")
