@@ -42,12 +42,17 @@ class VotesDB:
                             if getVoteFromJson(voteJson).poll_id == poll_id]
             if not voteList:
                 return VotesWrapper(0, {}, named=named, found=False, userFound=False, operationDone=False)
+            latestTimestamp = 0
+            for vote in voteList:
+                if vote.timestamp > latestTimestamp:
+                    latestTimestamp = vote.timestamp
             voteDict = {vote.chosen_option: list() for vote in voteList}
             for vote in voteList:
                 voteDict[vote.chosen_option].append(vote.user_id)
             if not named:
                 voteDict = {option: len(userlist) for option, userlist in voteDict.items()}
-            return VotesWrapper(after_timestamp, voteDict, named=named, found=True, userFound=True,
+            # get the last timestamp
+            return VotesWrapper(latestTimestamp, voteDict, named=named, found=True, userFound=True,
                                 operationDone=True)
         except:
             return VotesWrapper(None, {})
