@@ -2,6 +2,7 @@ import os
 
 import flask
 from flask import request, jsonify
+from flask_cors import CORS
 
 from MongoDatabase.MongoDB import MongoDB
 from MongoDatabase.Wrappers import UserWrapper
@@ -9,6 +10,7 @@ from MongoDatabase.Wrappers.PollWrapper import PollWrapper
 from MongoDatabase.Wrappers.VotesWrapper import VotesWrapper
 
 app = flask.Flask(__name__)
+CORS(app)
 app.config["DEBUG"] = True
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 database = MongoDB()
@@ -69,7 +71,7 @@ def createPoll():
             return jsonify(response=401, msg="Could not find user with session_id: " + session_id)
         # at this point we know the poll id, in wrapper
         return jsonify(response=200,
-                       sharedLink="/poll?poll_id=" + poll_wrapper.pollId)  # shared link might need to change
+                       id=poll_wrapper.pollId)  # shared link might need to change
     except:
         return jsonify(response=500, msg="Something went wrong")
 
