@@ -29,7 +29,7 @@ def logIn():
             return jsonify(response=404, msg="Could not find user with this mail: " + mail)
         if not user_wrapper.operationDone:  # miss match password
             return jsonify(response=400, msg="Could not find user with this password")
-        return jsonify(response=200, wrapper=user_wrapper)
+        return jsonify(response=200, wrapper=user_wrapper.makeJson())
     except:
         return jsonify(response=500, msg="Something went wrong")
 
@@ -47,7 +47,7 @@ def register():
         user_wrapper: UserWrapper = database.register(name, mail, password)
         if user_wrapper.userFound:
             return jsonify(response=400, msg="This E-mail already exists" + mail)
-        return jsonify(response=200, wrapper=user_wrapper)
+        return jsonify(response=200, wrapper=user_wrapper.makeJson())
     except:
         return jsonify(response=500, msg="Something went wrong")
 
@@ -88,7 +88,7 @@ def getPollByID():
             return jsonify(response=401, msg="Could not find user with session_id: " + session_id)
         if not poll_wrapper.found:
             return jsonify(response=404, msg="Could not find poll with id: " + poll_id)
-        return jsonify(response=200, wrapper=poll_wrapper)
+        return jsonify(response=200, wrapper=poll_wrapper.makeJson())
     except:
         return jsonify(response=500, msg="Something went wrong")
 
@@ -108,7 +108,7 @@ def vote():
             return jsonify(response=401, msg="Could not find user with session_id: " + session_id)
         if not vote_wrapper.found:
             return jsonify(response=404, msg="Could not find vote with id: " + poll_id)
-        return jsonify(response=200, wrapper=vote_wrapper)
+        return jsonify(response=200, wrapper=vote_wrapper.makeJson())
     except:
         return jsonify(response=500, msg="Something went wrong")
 
@@ -128,7 +128,7 @@ def results():
             return jsonify(response=401, msg="Could not find user with session_id: " + session_id)
         if not votes_wrapper.found:
             return jsonify(response=404, msg="Could not find poll with id: " + poll_id)
-        return jsonify(response=200, wrapper=votes_wrapper)
+        return jsonify(response=200, wrapper=votes_wrapper.makeJson())
     except:
         return jsonify(response=500, msg="Something went wrong")
 
