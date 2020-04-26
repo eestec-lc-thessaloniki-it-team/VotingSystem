@@ -16,7 +16,6 @@ class User:
         return False
 
     def makeJson(self):
-        # TODO: (done?)
         json = {
             "name": self.name,
             "mail": self.mail,

@@ -42,6 +42,7 @@ class PollsDBTest(unittest.TestCase):
         self.assertFalse(pollWrapper.operationDone)
         # ask for the poll that is inside
         pollWrapper: PollWrapper = self.connection.pollsDB.getPollById(self.poll_id)
+        print(pollWrapper.makeJson())
         self.assertTrue(pollWrapper.operationDone)
         self.assertIsNotNone(pollWrapper.object)
         poll = pollWrapper.object

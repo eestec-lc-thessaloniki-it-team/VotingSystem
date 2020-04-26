@@ -69,6 +69,7 @@ class UserDBTest(unittest.TestCase):
         self.assertEqual(user_id, "")
         # try with correct session_id
         userWrapper: UserWrapper = self.connection.userDB.logInUser(self.user1.mail, self.user1.password)
+        print(userWrapper.makeJson())
         userSaved: User = userWrapper.object
         self.assertIsNotNone(userSaved)
         (user, user_id) = self.connection.userDB.getUserWithSessionId(userSaved.session_id)

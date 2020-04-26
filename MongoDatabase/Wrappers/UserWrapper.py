@@ -8,3 +8,13 @@ class UserWrapper:
         self.found = found
         self.userFound = userFound
         self.operationDone = operationDone
+
+    def makeJson(self):
+        json = {
+            "found": self.found,
+            "userFound": self.userFound,
+            "operationDone": self.operationDone,
+            "object": self.object.makeJson()
+        }
+        del json['object']['password']
+        return json
