@@ -71,6 +71,7 @@ class VotesDBTest(unittest.TestCase):
         self.assertFalse(votesWrapper.operationDone)
         # get all votes from the first poll id, named=True
         votesWrapper: VotesWrapper = self.connection.votesDB.getAllVotes(self.poll_id, named=True)
+        print(votesWrapper.makeJson())
         self.assertTrue(votesWrapper.operationDone)
         self.assertTrue(votesWrapper.found)
         self.assertEqual(len(votesWrapper.votes), 2)
@@ -78,6 +79,7 @@ class VotesDBTest(unittest.TestCase):
         self.assertTrue(votesWrapper.votes.get(1)[0], self.user_id2)
         # get all votes from the second poll, named=False
         votesWrapper2: VotesWrapper = self.connection.votesDB.getAllVotes(self.poll_id2, named=False)
+        print(votesWrapper2.makeJson())
         self.assertTrue(votesWrapper2.operationDone)
         self.assertEqual(len(votesWrapper2.votes),2)
         self.assertEqual(votesWrapper2.votes.get(0),1)

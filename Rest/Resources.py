@@ -52,7 +52,7 @@ def register():
         return jsonify(response=500, msg="Something went wrong")
 
 
-@app.route("/create-poll")
+@app.route("/create-poll", methods=['POST'])
 def createPoll():
     """
     In request we want : question, options , named, unique and session id
@@ -77,12 +77,12 @@ def createPoll():
 @app.route("/poll", methods=['GET'])  # This function will use parameters in url
 def getPollByID():
     """
-    We want session_id in request
+    Pass id looking for + session id in the url, cause get Angular
     :return:
     """
     try:
         poll_id = request.args.get("id")
-        session_id = request.json.get("session_id")
+        session_id = request.args.get("session_id")
         poll_wrapper: PollWrapper = database.getPollById(poll_id, session_id)
         if not poll_wrapper.userFound:
             return jsonify(response=401, msg="Could not find user with session_id: " + session_id)
@@ -93,7 +93,7 @@ def getPollByID():
         return jsonify(response=500, msg="Something went wrong")
 
 
-@app.route("/vote")  # This function will use parameters in url
+@app.route("/vote", methods=['POST'])  # This function will use parameters in url
 def vote():
     """
     In request we want session_id, chosen_option
@@ -113,7 +113,7 @@ def vote():
         return jsonify(response=500, msg="Something went wrong")
 
 
-@app.route("/results")  # This function will use parameters in url
+@app.route("/results",methods=['POST'])  # This function will use parameters in url
 def results():
     """
     In request we want session_id, last_timestamp in format
@@ -133,14 +133,14 @@ def results():
         return jsonify(response=500, msg="Something went wrong")
 
 
-@app.route("/isValid-session")
+@app.route("/isValid-session", methods=['GET'])
 def validateSession():
     """
     Request will send a session-id and return if is valid
     :return:
     """
     try:
-        isValid = database.checkIfValidSessionId(request.json.get("session_id"))
+        isValid = database.checkIfValidSessionId(request.args.get("session_id"))
         return jsonify(response=200, isValid=isValid)
     except:
         return jsonify(response=500, msg="Something went wrong")
