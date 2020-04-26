@@ -54,7 +54,7 @@ def register():
         return jsonify(response=500, msg="Something went wrong")
 
 
-@app.route("/create-poll")
+@app.route("/create-poll", methods=['POST'])
 def createPoll():
     """
     In request we want : question, options , named, unique and session id
@@ -71,7 +71,7 @@ def createPoll():
             return jsonify(response=401, msg="Could not find user with session_id: " + session_id)
         # at this point we know the poll id, in wrapper
         return jsonify(response=200,
-                       sharedLink="/poll?poll_id=" + poll_wrapper.pollId)  # shared link might need to change
+                       id=poll_wrapper.pollId)  # shared link might need to change
     except:
         return jsonify(response=500, msg="Something went wrong")
 
