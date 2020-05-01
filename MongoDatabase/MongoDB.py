@@ -124,6 +124,15 @@ class MongoDB:
         (user, user_id) = self.userDB.getUserWithSessionId(session_id)
         return user is not None
 
+    def checkIfValidVote(self, session_id: str, poll_id: str) -> bool:
+        (user, user_id) = self.userDB.getUserWithSessionId(session_id)
+        pollWrapper: PollWrapper = self.pollsDB.getPollById(poll_id)
+        if user is None or pollWrapper.object is None:
+            return False
+        if self.votesDB.getVote(user_id, poll_id) is None:
+            return False
+        return True
+
 # PRINT TESTS
 #
 # my_db = MongoDB()

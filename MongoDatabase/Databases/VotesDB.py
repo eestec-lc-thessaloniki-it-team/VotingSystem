@@ -1,3 +1,5 @@
+from typing import Optional
+
 from MongoDatabase.Wrappers.VotesWrapper import VotesWrapper
 from model.Vote import Vote
 from model.Vote import getVoteFromJson
@@ -38,7 +40,8 @@ class VotesDB:
                             self.db.find({"timestamp": {"$gt": after_timestamp}})
                             if getVoteFromJson(voteJson).poll_id == poll_id]
                 if not voteList:
-                    return VotesWrapper(after_timestamp, {}, named=named, found=True, userFound=True, operationDone=True)
+                    return VotesWrapper(after_timestamp, {}, named=named, found=True, userFound=True,
+                                        operationDone=True)
             else:
                 voteList = [getVoteFromJson(voteJson) for voteJson in self.db.find()
                             if getVoteFromJson(voteJson).poll_id == poll_id]
@@ -66,3 +69,9 @@ class VotesDB:
         :return: boolean
         """
         return bool(self.db.delete_many({"poll_id": poll_id}).deleted_count)
+
+    def getVote(self, user_id: str, poll_id: str) -> Optional[Vote]:
+        jsonReturned = self.db.find_one({"user_id": user_id, "poll_id": poll_id})
+        if jsonReturned is None:
+            return None
+        return getVoteFromJson(jsonReturned)

@@ -81,9 +81,14 @@ class VotesDBTest(unittest.TestCase):
         votesWrapper2: VotesWrapper = self.connection.votesDB.getAllVotes(self.poll_id2, named=False)
         print(votesWrapper2.makeJson())
         self.assertTrue(votesWrapper2.operationDone)
-        self.assertEqual(len(votesWrapper2.votes),2)
-        self.assertEqual(votesWrapper2.votes.get(0),1)
-        self.assertEqual(votesWrapper2.votes.get(1),1)
+        self.assertEqual(len(votesWrapper2.votes), 2)
+        self.assertEqual(votesWrapper2.votes.get(0), 1)
+        self.assertEqual(votesWrapper2.votes.get(1), 1)
+
+    def testGetVote(self):
+        vote = self.connection.votesDB.getVote(self.user_id, self.poll_id)
+        self.assertIsNotNone(vote)
+
 
     def tearDown(self) -> None:
         # delete users, poll, votes

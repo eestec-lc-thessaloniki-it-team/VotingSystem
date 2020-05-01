@@ -115,7 +115,7 @@ def vote():
         return jsonify(response=500, msg="Something went wrong")
 
 
-@app.route("/results",methods=['POST'])  # This function will use parameters in url
+@app.route("/results", methods=['POST'])  # This function will use parameters in url
 def results():
     """
     In request we want session_id, last_timestamp in format
@@ -143,6 +143,20 @@ def validateSession():
     """
     try:
         isValid = database.checkIfValidSessionId(request.args.get("session_id"))
+        return jsonify(response=200, isValid=isValid)
+    except:
+        return jsonify(response=500, msg="Something went wrong")
+
+@app.route("/hasVote", methods=['GET'])
+def validateVote():
+    """
+    Request will send a session_id and a poll_id and we return if user has voted
+    :return:
+    """
+    session_id = request.args.get("session_id")
+    poll_id = request.args.get("poll_id")
+    try:
+        isValid = database.checkIfValidVote(session_id, poll_id)
         return jsonify(response=200, isValid=isValid)
     except:
         return jsonify(response=500, msg="Something went wrong")
