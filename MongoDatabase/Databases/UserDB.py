@@ -118,6 +118,6 @@ class UserDB:
             votesDict = {option:list() for option in votesWrapper.votes}
             for option, userList in votesWrapper.votes.items():
                 votesDict[option] = [getUserFromJson(self.db.find_one({"_id": ObjectId(user_id)})).name for user_id in userList]
-            return VotesWrapper(votesWrapper.lastTimestamp, votesDict, found=votesWrapper.found,
+            return VotesWrapper(votesWrapper.lastTimestamp, votesDict, found=votesWrapper.found, named=votesWrapper.named,
                                 userFound=votesWrapper.userFound, operationDone=votesWrapper.operationDone)
         return VotesWrapper(votesWrapper.lastTimestamp, {}, found=False, userFound=False, operationDone=False)
