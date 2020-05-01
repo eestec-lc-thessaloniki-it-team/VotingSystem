@@ -129,7 +129,7 @@ class MongoDB:
         pollWrapper: PollWrapper = self.pollsDB.getPollById(poll_id)
         if user is None or pollWrapper.object is None:
             return False
-        if self.votesDB.getVote(user_id, poll_id) is None:
+        if self.votesDB.getVote(user_id, poll_id) is not None:
             return False
         return True
 
