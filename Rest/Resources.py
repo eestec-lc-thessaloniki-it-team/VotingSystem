@@ -110,6 +110,8 @@ def vote():
             return jsonify(response=401, msg="Could not find user with session_id: " + session_id)
         if not vote_wrapper.found:
             return jsonify(response=404, msg="Could not find vote with id: " + poll_id)
+        if not vote_wrapper.operationDone:
+            return jsonify(response=400, msg="Already voted")
         return jsonify(response=200, wrapper=vote_wrapper.makeJson())
     except:
         return jsonify(response=500, msg="Something went wrong")

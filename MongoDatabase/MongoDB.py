@@ -86,6 +86,8 @@ class MongoDB:
         poll: PollWrapper = self.pollsDB.getPollById(poll_id)
         if not poll.found:
             return VotesWrapper("", {}, named=False, found=False, userFound=True, operationDone=False)
+        if not self.checkIfValidVote(session_id=session_id, poll_id=poll_id):
+            return VotesWrapper("", named=poll.object.named, found=True, userFound=True, operationDone=False)
         votesWrapper: VotesWrapper = self.votesDB.createVote(user_id, poll_id, poll.object.named,
                                                              chosen_option)
         if votesWrapper.named:
