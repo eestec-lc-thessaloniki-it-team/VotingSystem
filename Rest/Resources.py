@@ -116,6 +116,26 @@ def vote():
     except:
         return jsonify(response=500, msg="Something went wrong")
 
+@app.route("/mvote",methods=['POST'])
+def mvote():
+    """
+    Multiple votes, gets same things, but now chose_option is a list of ints and
+    create a vote for each
+    :return:
+    """
+    try:
+        poll_id = request.args.get("id")
+        session_id = request.json.get("session_id")
+        chosen_option = request.json.get("chosen_option")
+        vote_wrapper: VotesWrapper = database.mvotes(poll_id, chosen_option, session_id)
+        if not vote_wrapper.userFound:
+            return jsonify(response=401, msg="Could not find user with session_id: " + session_id)
+        if not vote_wrapper.found:
+            return jsonify(response=404, msg="Could not find vote with id: " + poll_id)
+        return jsonify(response=200, wrapper=vote_wrapper.makeJson())
+    except:
+        return jsonify(response=500, msg="Something went wrong")
+
 
 @app.route("/results", methods=['POST'])  # This function will use parameters in url
 def results():

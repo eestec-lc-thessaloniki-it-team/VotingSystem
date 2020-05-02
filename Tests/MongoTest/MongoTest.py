@@ -186,6 +186,10 @@ class MongoTest(unittest.TestCase):
         self.assertTrue(votesWrapper.userFound)
         self.assertTrue(votesWrapper.found)
 
+    def test_mvotes(self):
+        votesWrapper:VotesWrapper = self.connection.mvotes(self.poll_id,[0,1],session_id=self.session_id)
+        print(votesWrapper)
+
     def tearDown(self) -> None:
         user: UserWrapper = self.connection.userDB.deleteUser(self.user.mail)
         self.assertTrue(user.operationDone)

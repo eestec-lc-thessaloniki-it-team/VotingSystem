@@ -95,6 +95,22 @@ class MongoDB:
         else:
             return votesWrapper
 
+    def mvotes(self, poll_id: str, chosen_option: [], session_id: str):
+        (user, user_id) = self.userDB.getUserWithSessionId(session_id)
+        if user is None:
+            return VotesWrapper("", {}, named=False, found=False, userFound=False, operationDone=False)
+        poll: PollWrapper = self.pollsDB.getPollById(poll_id)
+        if not poll.found:
+            return VotesWrapper("", {}, named=False, found=False, userFound=True, operationDone=False)
+        votesWrapper: VotesWrapper = None
+        for choice in chosen_option:
+            votesWrapper = self.votesDB.createVote(user_id, poll_id, poll.object.named,
+                                                   choice) #return the last one
+        if votesWrapper.named:
+            return self.userDB.fillUsernames(votesWrapper)
+        else:
+            return votesWrapper
+
     def results(self, poll_id: str, after_timestamp, session_id: str):
         """
         Checks if user exists. Gets all votes for this poll_id, divided into options.
