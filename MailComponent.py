@@ -5,17 +5,19 @@ Created on Thu May 21 12:58:02 2020
 
 @author: mavroudo
 """
-import smtplib, ssl
-from email.mime.text import MIMEText
+import smtplib
+import ssl
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 
 class MailComponent:
-    def __init__(self):
-        self.port=465 # For ssl
-        self.password="" #this will be read from the enviroment
-        self.sender_email = "eestec.voting@gmail.com"
-        self.smtp_server= "smtp.gmail.com"
-        self.html_to_vote="""\
+    def __init__(self, sender_email, password, smtp_server, port):
+        self.port = port  # For ssl
+        self.password = password
+        self.sender_email = sender_email
+        self.smtp_server = smtp_server
+        self.html_to_vote = """\
                 <html>
                   <body>
                     <p>Hi,<br>
@@ -25,7 +27,7 @@ class MailComponent:
                   </body>
                 </html>
                 """
-        self.html_hash="""\
+        self.html_hash = """\
                 <html>
                   <body>
                     <p>Hi,<br>
@@ -39,7 +41,7 @@ class MailComponent:
                 
     def sendVotingCode(self,url_voting,receiver_email):
         message = MIMEMultipart("alternative")
-        message["Subject"] = "multipart test"
+        message["Subject"] = "Vote in EESTEC"
         message["From"] = self.sender_email
         message["To"] = receiver_email
         html = MIMEText(self.html_to_vote, "html")
@@ -64,8 +66,13 @@ class MailComponent:
 
 
 
-
-
+import os
+if __name__ == '__main__':
+    mail = os.getenv("MAIL_ACCOUNT")
+    password = os.getenv("MAIL_PASSWORD")
+    smtp_server=os.getenv("MAIL_SMTP_SERVER")
+    port=os.getenv("MAIL_SMTP_PORT")
+    print(mail,password,smtp_server,port)
 
 # Turn these into plain/html MIMEText objects
 #part1 = MIMEText(text, "plain")

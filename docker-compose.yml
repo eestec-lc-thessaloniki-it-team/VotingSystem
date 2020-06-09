@@ -1,0 +1,20 @@
+version: '3'
+services:
+  database:
+    image: 'mongo'
+    container_name: 'mongo_eestec'
+    env_file:  #Enviroments will be passed from .env file
+      - .env
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo-js:ro
+      - ./mongo-volume:/data/db
+    ports:
+      - '2017-2019:2017-2019'
+  flask_app:
+    container_name: "flask_app"
+    env_file:
+      - .env
+    build: .
+    ports:
+      - "5000:5000"
+

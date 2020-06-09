@@ -1,5 +1,6 @@
 import os
 
+from dotenv import load_dotenv
 import flask
 from flask import request, jsonify
 from flask_cors import CORS
@@ -13,7 +14,15 @@ app = flask.Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = True
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-database = MongoDB()
+
+load_dotenv()
+username=os.getenv("MONGO_INITDB_ROOT_USERNAME")
+password=os.getenv("MONGO_INITDB_ROOT_PASSWORD")
+ip=os.getenv("MONGO_IP")
+db=os.getenv("MONGO_INITDB_DATABASE")
+print(username,password,ip,db)
+database = MongoDB(username,password,ip,db)
+
 
 
 @app.route("/login", methods=['POST'])

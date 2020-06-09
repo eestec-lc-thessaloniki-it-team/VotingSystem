@@ -11,7 +11,8 @@ from MongoDatabase.Databases.VotesDB import VotesDB
 from MongoDatabase.Wrappers.PollWrapper import PollWrapper
 from MongoDatabase.Wrappers.UserWrapper import UserWrapper
 from MongoDatabase.Wrappers.VotesWrapper import VotesWrapper
-from MongoDatabase.user import *  # get credentials
+
+# from MongoDatabase.user import *  # get credentials  maybe from enviroment
 
 
 class MongoDB:
@@ -19,8 +20,8 @@ class MongoDB:
     Will contain a function for connecting to db and then one of the other 3 objects from the same package
     """
 
-    def __init__(self, database="lcThessalonikiVoting"):
-        url = """mongodb://{}:{}@116.203.85.249/{}""".format(username, password, database)
+    def __init__(self, username, password, ip, database):
+        url = """mongodb://{}:{}@{}/{}""".format(username, password,ip, database)
         self.client = MongoClient(url, authSource="admin")[database]
         self.userDB = UserDB(self.client.lcThessaloniki)
         self.pollsDB = PollsDB(self.client.lcThessaloniki)
@@ -124,29 +125,4 @@ class MongoDB:
         (user, user_id) = self.userDB.getUserWithSessionId(session_id)
         return user is not None
 
-# PRINT TESTS
-#
-# my_db = MongoDB()
-# user1 = User("user1","mail1","sdaeas")
-# user2 = User("user2","mail2","ssdaxs")
-# user3 = User("user3","mail3","sdgdas")
-#
-# user1_id = my_db.userDB.db.insert_one(user1.makeJson()).inserted_id
-# user2_id = my_db.userDB.db.insert_one(user2.makeJson()).inserted_id
-# user3_id = my_db.userDB.db.insert_one(user3.makeJson()).inserted_id
-#
-# vote1 = my_db.votesDB.createVote(str(user1_id),"1",1)
-# vote2 = my_db.votesDB.createVote(str(user2_id),"1",0)
-# vote3 = my_db.votesDB.createVote(str(user3_id),"1",2)
-# vote4 = my_db.votesDB.createVote(str(user3_id),"1",3)
-# vote5 = my_db.votesDB.createVote(str(user3_id),"1",1)
-# vote6 = my_db.votesDB.createVote(str(user3_id),"1",0)
-#
-# wrapper = my_db.votesDB.getAllVotes("1",True)
-# print(wrapper.votes)
-#
-# wrapper = my_db.userDB.fillUsernames(wrapper)
-# print(wrapper.votes)
-#
-# my_db.votesDB.db.drop()
-# my_db.userDB.db.drop()
+
